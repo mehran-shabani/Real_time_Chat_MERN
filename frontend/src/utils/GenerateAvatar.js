@@ -1,26 +1,16 @@
-const generateDiceBearAvataaars = (seed) =>
-  `https://avatars.dicebear.com/api/avataaars/${seed}.svg`;
+import { useMemo } from 'react';
+import { createAvatar } from '@dicebear/core';
+import { lorelei } from '@dicebear/collection';
 
-const generateDiceBearBottts = (seed) =>
-  `https://avatars.dicebear.com/api/bottts/${seed}.svg`;
+function GenerateAvatar() {
+  const avatar = useMemo(() => {
+    return createAvatar(lorelei, {
+      size: 128,
+      // ... other options
+    }).toDataUri();
+  }, []);
 
-const generateDiceBearGridy = (seed) =>
-  `https://avatars.dicebear.com/api/gridy/${seed}.svg`;
+  return <img src={avatar} alt="Avatar" />;
+}
 
-export const generateAvatar = () => {
-  const data = [];
-
-  for (let i = 0; i < 2; i++) {
-    const res = generateDiceBearAvataaars(Math.random());
-    data.push(res);
-  }
-  for (let i = 0; i < 2; i++) {
-    const res = generateDiceBearBottts(Math.random());
-    data.push(res);
-  }
-  for (let i = 0; i < 2; i++) {
-    const res = generateDiceBearGridy(Math.random());
-    data.push(res);
-  }
-  return data;
-};
+export default GenerateAvatar;
