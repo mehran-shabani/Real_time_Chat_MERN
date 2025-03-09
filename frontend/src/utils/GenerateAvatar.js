@@ -1,16 +1,22 @@
-import { useMemo } from 'react';
-import { createAvatar } from '@dicebear/core';
-import { lorelei } from '@dicebear/collection';
+import { useMemo } from "react";
+import { createAvatar } from "@dicebear/core";
+import { lorelei } from "@dicebear/collection";
 
-function GenerateAvatar() {
-  const avatar = useMemo(() => {
-    return createAvatar(lorelei, {
-      size: 128,
-      // ... other options
-    }).toDataUri();
+const generateAvatar = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const avatars = useMemo(() => {
+    const avatars = [];
+    for (let i = 0; i < 12; i++) {
+      const avatar = createAvatar(lorelei, {
+        seed: i.toString(),
+        size: 128,
+      }).toDataUriSync();
+      avatars.push(avatar);
+    }
+    return avatars;
   }, []);
 
-  return <img src={avatar} alt="Avatar" />;
-}
+  return avatars;
+};
 
-export default GenerateAvatar;
+export { generateAvatar };

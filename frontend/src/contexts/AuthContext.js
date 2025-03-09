@@ -1,13 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-} from "firebase/auth";
+import axios from "axios";
 
-import auth from "../config/firebase";
-
+const API_URL = "http://localhost:8000/api/auth/";
 const AuthContext = createContext();
 
 export function useAuth() {
@@ -15,48 +9,29 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
-  function register(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
-  }
-
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
-
-  function logout() {
-    return signOut(auth);
-  }
-
-  function updateUserProfile(user, profile) {
-    return updateProfile(user, profile);
-  }
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  const value = {
-    currentUser,
-    error,
-    setError,
-    login,
-    register,
-    logout,
-    updateUserProfile,
+  const login = async (email, password) => {
+    const res = await axios.post(`${API_URL}token/`, { email, password });
+    localStorage.setItem("token", res.data.access);
+    setCurrentUser(res.data.user);
   };
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    setCurrentUser(null);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setCurrentUser(token);
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider value={{ currentUser, login, logout }}>
+      {children}
     </AuthContext.Provider>
   );
 }
